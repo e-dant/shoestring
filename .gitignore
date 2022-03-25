@@ -5,6 +5,9 @@ www/out
 www/src/img/*
 www/src/img/logo.*
 www/src/img/logo/*
+!www/src/img/symbols
+!www/src/img/structure/
+!www/src/img/mkfavicon*
 www/src/html/*
 www/src/html/resume.html
 www/src/html/case-study-0.html
