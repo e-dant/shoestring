@@ -2,7 +2,12 @@
 .tmp
 www/.tmp
 www/out
+www/src/img/*
+www/src/img/logo.*
+www/src/img/logo/*
+www/src/html/*
 www/src/html/resume.html
 www/src/html/case-study-0.html
+!www/src/html/index.html
 template.html
 cloudbuild.yaml

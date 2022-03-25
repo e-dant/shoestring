@@ -13,9 +13,13 @@ Shoestring is modular. It integrates optionally, easily and out of the box with:
 - VCS (built-in)
 - C++/PHP/Node.js/Go/etc.
 
-It's the framework we built to host [our website](https://edant.io). The source for our website is available in full in this repository. We consider it an example project.
+It's the framework we built to manage [our website](https://edant.io). 
 
 We hope you enjoy it.
+
+## Licenses
+
+The majority of this project are licensed permissively with the MIT License. There are things which this project uses (such as Bootstrap and Boost) which may have different, but always permissive, licenses.
 
 ## Getting started
 
