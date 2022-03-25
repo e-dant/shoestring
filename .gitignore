@@ -1,0 +1,8 @@
+.log
+.tmp
+www/.tmp
+www/out
+www/src/html/resume.html
+www/src/html/case-study-0.html
+template.html
+cloudbuild.yaml

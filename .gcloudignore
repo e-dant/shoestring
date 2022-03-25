@@ -1,0 +1,11 @@
+.git/
+module
+module.*
+deploy.sh
+archive
+www/src
+.log
+.manifest
+www/.manifest
+.gitignore
+.dockerignore

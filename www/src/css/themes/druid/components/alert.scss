@@ -1,0 +1,19 @@
+//
+// alert
+//
+
+// scss-docs-start alert-variables
+$alert-padding-y:                   .75rem;
+$alert-padding-x:                   1.25rem;
+$alert-margin-bottom:               1rem;
+$alert-border-radius:               $border-radius;
+$alert-link-font-weight:            $font-weight-bold;
+$alert-border-width:                $border-width;
+
+$alert-bg-scale:                    -80%;
+$alert-border-scale:                -70%;
+$alert-color-scale:                 40%;
+
+$alert-dismissible-padding-r:       $alert-padding-x * 3; 
+// alet padding*3 -> alert padding for itself and each side
+// scss-docs-end alert-variables

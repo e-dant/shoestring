@@ -1,0 +1,107 @@
+//
+// typography
+//
+
+// generic font and typography rules
+
+$font-weight-semibold:          600;
+$page-title-color:              inherit;
+$text-title-color:              $seagreen;
+//#6c757d;
+$code-font-size:                90%;
+$code-color:                    $seagreen;
+//tint-color(
+//  $seagreen, 
+//  10%);
+
+$kbd-padding-y:                 0.2rem;
+$kbd-padding-x:                 0.4rem;
+$kbd-font-size:                 $code-font-size;
+$kbd-color:                     $white;
+$kbd-bg:                        $gray-900;
+$font-family-sans-serif:        "Open Sans", 
+                                "Helvetica", 
+                                "Arial", 
+                                Sans-Serif, 
+                                sans-serif;
+$font-family-monospace:         "Iosevka", 
+                                "SFMono-Regular", 
+                                "Menlo", 
+                                "Monaco", 
+                                "Consolas", 
+                                "Liberation Mono", 
+                                "Courier New", 
+                                monospace;
+$font-family-base:              $font-family-sans-serif;
+$font-family-code:              var(--#{$variable-prefix}font-monospace);
+$font-size-root:                null;
+$font-size-base:                0.9rem;
+$font-size-sm:                  $font-size-base - .025;
+$font-size-lg:                  $font-size-base * 1.390;
+$font-weight-lighter:           lighter;
+$font-weight-light:             300;
+$font-weight-normal:            400;
+$font-weight-bold:              700;
+$font-weight-bolder:            bolder;
+$font-weight-base:              $font-weight-normal;
+$line-height-base:              1.5;
+$line-height-sm:                1.25;
+$line-height-lg:                2;
+$h1-font-size:                  2.25rem;
+$h2-font-size:                  1.875rem;
+$h3-font-size:                  1.5rem;
+$h4-font-size:                  1.125rem;
+$h5-font-size:                  0.9375rem;
+$h6-font-size:                  0.75rem;
+$font-sizes: (                  1: $h1-font-size,
+                                2: $h2-font-size,
+                                3: $h3-font-size,
+                                4: $h4-font-size,
+                                5: $h5-font-size,
+                                6: $h6-font-size);
+$headings-margin-bottom:        $spacer * .5;
+$headings-font-family:          null;
+$headings-font-style:           null;
+$headings-font-weight:          500;
+$headings-line-height:          1.1;
+$headings-color:                null;
+$display-font-sizes: (          1: 5rem,
+                                2: 4.5rem,
+                                3: 4rem,
+                                4: 3.5rem,
+                                5: 3rem,
+                                6: 2.5rem);
+$display-font-weight:           300;
+$display-line-height:           $headings-line-height;
+$lead-font-size:                $font-size-base * 1.25;
+$lead-font-weight:              300;
+$small-font-size:               0.75rem;
+$sub-sup-font-size:             0.75em;
+$text-muted:                    $gray-600;
+$initialism-font-size:          $small-font-size;
+$blockquote-margin-y:           $spacer;
+$blockquote-font-size:          $font-size-base * 1.25;
+$blockquote-footer-color:       $gray-600;
+$blockquote-footer-font-size:   $small-font-size;
+$hr-margin-y:                   $spacer - 0.5rem;
+$hr-color:                      inherit;
+$hr-height:                     $border-width;
+$hr-opacity:                    .25;
+$legend-margin-bottom:          .5rem;
+$legend-font-size:              1.5rem;
+$legend-font-weight:            null;
+$mark-padding:                  .2em;
+$dt-font-weight:                $font-weight-bold;
+$nested-kbd-font-weight:        $font-weight-bold;
+$list-inline-padding:           6px;
+$mark-bg:                       #fcf8e3;
+
+// link items
+$link-color:                    shade-color($salmon-splitcomplement-2, 30%);
+$link-decoration:               none;
+$link-shade-percentage:         15%;
+$link-hover-color:              $salmon-splitcomplement-2;//shift-color($link-color, $link-shade-percentage);
+$link-hover-decoration:         none;
+
+$stretched-link-pseudo-element: after;
+$stretched-link-z-index:        1;

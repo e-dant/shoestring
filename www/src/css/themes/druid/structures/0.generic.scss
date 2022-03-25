@@ -1,0 +1,271 @@
+//
+// generic
+//
+// some generic definitions used in various structures and components
+
+$generic-structure-size-xsm:                  32px;
+$generic-structure-size-sm:                   65px;
+$generic-structure-size-md:                   130px;
+$generic-structure-size-lg:                   260px;
+$generic-structure-size-xl:                   520px;
+
+$content-page-padding:                        0
+                                              0 
+                                              5rem 
+                                              0;
+
+$vertical-menubar-width:                      260px;
+$horizontal-menubar-height:                   70px;
+
+// nav
+$nav-link-padding-y:                          0.5rem;
+$nav-link-padding-x:                          1rem;
+$nav-link-font-size:                          null;
+$nav-link-font-weight:                        null;
+$nav-link-color:                              null;
+$nav-link-hover-color:                        $white;
+$nav-link-transition:                         color 0.15s ease-in-out, 
+                                              background-color 0.15s ease-in-out, 
+                                              border-color 0.15s ease-in-out;
+$nav-link-disabled-color:                     $gray-600;
+$nav-link-height:                             $font-size-base
+                                              *$line-height-base
+                                              +$nav-link-padding-y
+                                              *2;
+$nav-tabs-border-color:                       $gray-300;
+$nav-tabs-border-width:                       $border-width;
+$nav-tabs-border-radius:                      $border-radius;
+$nav-tabs-link-hover-border-color:            $gray-200 
+                                              $gray-200 
+                                              $nav-tabs-border-color;
+$nav-tabs-link-active-color:                  shade-color(
+                                                  $gray-700, 
+                                                  20%);
+$nav-tabs-link-active-bg:                     $white;
+$nav-tabs-link-active-border-color:           $gray-300 
+                                              $gray-300 
+                                              $nav-tabs-link-active-bg;
+$nav-pills-bg:                                #eef2f7;
+$nav-pills-border-radius:                     $border-radius;
+$nav-pills-link-active-color:                 $component-active-color;
+$nav-pills-link-active-bg:                    $component-active-bg;
+
+// topbar/navbar
+$topbar-padding:                              0;
+$topbar-padding-x:                            0;
+$topbar-padding-y:                            0;
+$topbar-width:                                260px;
+$topbar-height:                               3rem;
+$topbar-height-half:                          calc(
+                                                $topbar-height 
+                                                / -2);
+$topbar-line-height:                          $topbar-height;//70px;
+$topbar-logo-width:                           3rem;
+$topbar-logo-height:                          $topbar-logo-width;
+$topbar-logo-height-half:                     calc(
+                                                $topbar-logo-height 
+                                                / -2);
+$topbar-logo-line-height:                     $topbar-height;//70px;
+$navbar-padding-x:                            $topbar-padding-x;
+$navbar-padding-y:                            $topbar-padding-y;
+$navbar-nav-link-padding-x:                   0.5rem;
+//navbar-nav-link-padding-y:                  there is no such item
+$navbar-brand-font-size:                      $font-size-lg;
+$navbar-brand-height:                         $navbar-brand-font-size
+                                              *$line-height-base;
+$navbar-brand-padding-y:                      subtract(
+                                                  $nav-link-height, 
+                                                  $navbar-brand-height)
+                                              *0.5;
+$navbar-brand-margin-end:                     1rem;
+$navbar-toggler-padding-y:                    0.25rem;
+$navbar-toggler-padding-x:                    0.75rem;
+$navbar-toggler-font-size:                    $font-size-lg;
+$navbar-toggler-border-radius:                $btn-border-radius;
+$navbar-toggler-focus-width:                  $btn-focus-width;
+$navbar-toggler-transition:                   box-shadow 0.15s ease-in-out;
+
+//
+// position
+//
+// Define the edge positioning anchors of the position utilities.
+
+// TODO:
+// add, remove and adjust these
+$position-values: (
+  0: 0,
+  50: 50%,
+  100: 100%
+);
+
+// defines properties used across the renderable
+// parts of the html document.
+// I may put these in seperate source files, hence 
+// the notes below
+
+//
+// spacing (as structure/spacing.scss)
+//
+$spacer: 1.5rem;
+$spacers: (
+                                            0: 0,
+                                            1: $spacer*0.25,
+                                            2: $spacer*0.5,
+                                            3: $spacer,
+                                            4: $spacer*1.5,
+                                            5: $spacer*3 );
+$negative-spacers:                          if(
+                                              $enable-negative-margins, 
+                                              negativify-map(
+                                                $spacers), 
+                                              null);
+
+//
+// gutter (as structure/gutter.scss)
+//
+$gutters:                                   $spacers;
+
+//
+// paragraph (as structure/paragraph.scss)
+//
+$paragraph-margin-bottom:                   1rem;
+
+//
+// border (as structure/border.scss)
+//
+$border-width:                              1px;
+$border-widths: (
+                                            0: 0,
+                                            1: 1px,
+                                            2: 2px,
+                                            3: 3px,
+                                            4: 4px,
+                                            5: 5px);
+$border-color:                              $gray-200;
+$border-radius:                             0.25rem;
+$border-radius-sm:                          0.2rem;
+$border-radius-lg:                          0.3rem;
+$border-radius-pill:                        50rem;
+$box-shadow:                                0px 0px 35px 0px rgba(154, 161, 171, 0.15);
+$box-shadow-sm:                             0 0.125rem 0.25rem rgba($black, 0.075);
+$box-shadow-lg:                             0 0 45px 0 rgba(0, 0, 0, 0.12);
+$box-shadow-inset:                          inset 0 1px 2px rgba($black, 0.075);
+
+//
+// zindex (as structure/zindex.scss)
+//
+$zindex-dropdown:                           1000;
+$zindex-sticky:                             1020;
+$zindex-fixed:                              1030;
+$zindex-offcanvas-backdrop:                 1040;
+$zindex-offcanvas:                          1045;
+$zindex-modal-backdrop:                     1050;
+$zindex-modal:                              1055;
+$zindex-popover:                            1070;
+$zindex-tooltip:                            1080;
+
+//
+// container (as structure/container.scss)
+//
+// generally ok default maximums for various screen sizes
+// used for layout changes (like breakpoints)
+$container-max-widths: (
+                                              sm: 540px,
+                                              md: 720px,
+                                              lg: 960px,
+                                              xl: 1140px,
+                                              xxl: 1320px);
+$container-padding-x:                         1rem;
+$container-padding-y:                         1rem;
+
+//
+// grid (as structure/grid.scss)
+//
+// grid-breakpoints:
+//  generally ok default minimums for various screen sizes
+//  used for layout changes (like breakpoints)
+//  grid breakpoints must start at 0 and ascend
+// grid-column: 
+//  controls how columns fit into a container
+$grid-breakpoints: (
+                                              xs: 0,
+                                              sm: 576px,
+                                              md: 768px,
+                                              lg: 992px,
+                                              xl: 1200px,
+                                              xxl: 1400px
+);
+$grid-columns:                                12;
+$grid-gutter-width:                           24px;
+$grid-row-columns:                            6;
+
+//
+// caret (as structure/caret.scss)
+//
+$caret-width:                                 0.25em;
+$caret-vertical-align:                        $caret-width * .85;
+$caret-spacing:                               $caret-width * .85;
+
+//
+// transition (as structure/transition.scss)
+//
+$transition-base:                             all 0.2s ease-in-out;
+$transition-fade:                             opacity 0.15s linear;
+$transition-collapse:                         height 0.35s ease;
+$transition-collapse-width:                   width 0.35s ease;
+
+//
+// table (as structure/transition.scss)
+//
+$table-cell-padding-y:                        0.95rem;
+$table-cell-padding-x:                        0.95rem;
+$table-cell-padding-y-sm:                     0.5rem;
+$table-cell-padding-x-sm:                     0.5rem;
+$table-cell-vertical-align:                   top;
+$table-color:                                 $body-color;
+$table-bg:                                    transparent;
+$table-accent-bg:                             transparent;
+$table-th-font-weight:                        null;
+$table-striped-color:                         $gray-700;
+$table-striped-bg-factor:                     1;
+$table-striped-bg:                            rgba(
+                                                $gray-100, 
+                                                $table-striped-bg-factor);
+$table-active-color:                          $table-color;
+$table-active-bg-factor:                      0.4;
+$table-active-bg:                             rgba(
+                                                $gray-300, 
+                                                $table-active-bg-factor);
+$table-hover-color:                           $table-color;
+$table-hover-bg-factor:                       0.075;
+$table-hover-bg:                              $gray-100;
+$table-border-factor:                         0.1;
+$table-border-width:                          $border-width;
+$table-border-color:                          $gray-200;
+$table-striped-order:                         odd;
+$table-group-separator-color:                 lighten(
+                                                $gray-300, 
+                                                5%);
+$table-caption-color:                         $text-muted;
+$table-bg-scale:                              -80%;
+$table-variants: (
+                                              "primary":   shift-color(
+                                                $primary, 
+                                                $table-bg-scale),
+                                              "secondary": shift-color(
+                                                $secondary, 
+                                                $table-bg-scale),
+                                              "success":   shift-color(
+                                                $success, 
+                                                $table-bg-scale),
+                                              "info":      shift-color(
+                                                $info, 
+                                                $table-bg-scale),
+                                              "warning":   shift-color(
+                                                $warning, 
+                                                $table-bg-scale),
+                                              "danger":    shift-color(
+                                                $danger, 
+                                                $table-bg-scale),
+                                              "light":     $light,
+                                              "dark":      $dark,);

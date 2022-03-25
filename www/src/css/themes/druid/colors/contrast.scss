@@ -1,0 +1,12 @@
+//
+// contrast
+//
+
+// target contrast ratio against which an element 
+// is considered dark or light by comparison.
+// some good values are [3.0, 4.5, 7.0]
+
+$min-contrast-ratio:   1.8;
+// for use in the color contrast function
+$color-contrast-dark:      $gray-900;
+$color-contrast-light:     $white;

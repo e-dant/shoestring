@@ -1,0 +1,84 @@
+//
+// breadcrumb
+//
+
+$breadcrumb-font-size:              11pt;
+$breadcrumb-padding-x:              3rem;
+$breadcrumb-padding-y:              0;
+$breadcrumb-item-padding-x:         0.5rem;
+$breadcrumb-margin-bottom:          0;
+$breadcrumb-border-radius:          null;
+$breadcrumb-bg:                     null;
+$breadcrumb-divider:                quote("\F09DF");//quote("\F0142");
+$breadcrumb-divider-flipped:        quote("\F09DF");
+
+// divider
+$breadcrumb-divider-color:          tint-color(
+                                      $skyblue, 
+                                      95%);
+
+// active page/item
+$breadcrumb-active-color:           tint-color(
+                                      $skyblue, 
+                                      88%);
+
+// www/base name (private, non-bootstrap)
+$breadcrumb-link-color:             $breadcrumb-active-color;
+$breadcrumb-link-hover-color:       $salmon;//$white;
+$breadcrumb-link-hover-transition:  color 1s;
+
+//mix(
+//  $salmon, 
+//  $breadcrumb-active-color, 
+//  35%);
+
+.breadcrumb {
+  padding:                          $breadcrumb-padding-y 
+                                    $breadcrumb-padding-x;
+  margin-bottom:                    $breadcrumb-margin-bottom;
+  list-style:                       none;
+  background-color:                 $breadcrumb-bg;
+  font-size:                        $breadcrumb-font-size;
+}
+
+.breadcrumb-item {
+  height:                           $topbar-height;
+  line-height:                      $topbar-height;
+  // inserts an arrow between breadcrumbs
+  +.breadcrumb-item {
+    &::before {
+      font-family:                  "Material Design Icons";
+      font-size:                    $breadcrumb-font-size;
+      content:                      $breadcrumb-divider;
+    }
+  }
+}
+
+//mix($color1, $color2, $weight: 50%)
+
+.breadcrumb {
+  //color:                         $breadcrumb-link-color;
+  .breadcrumb-item {
+    color:                         $breadcrumb-link-color;
+  }
+  a {
+    color:                         $breadcrumb-link-color;
+    transition:                    $breadcrumb-link-hover-transition;
+  }
+  a:hover {
+    color:                         $breadcrumb-link-hover-color;
+    transition:                    none;
+  }
+}
+
+//@include media-breakpoint-down(md) {
+//    .breadcrumb {
+//        display: none;
+//    }
+//}
+//
+//@include media-breakpoint-down(sm) {
+//    .breadcrumb {
+//        display: none;
+//    }
+//}

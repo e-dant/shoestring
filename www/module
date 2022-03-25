@@ -1,0 +1,445 @@
+#!/bin/bash
+
+MODULE_NAME="$(basename $PWD)"
+OUT_DIR="out"
+SRC_DIR="src"
+ROOT_DIR=".."
+MODULE_VERSION="1.0.0"
+MODULE_DEBUG=true
+
+TAB="\t";
+RGL="\e[0;0m";
+BLD="\e[0;1m";
+ITA="\e[0;3m";
+UL="\e[0;4m";
+HL="\e[0;7m";
+ST="\e[0;9m";
+GRY="\e[0;30m";
+RED="\e[0;31m";
+GRN="\e[0;32m";
+YLO="\e[0;33m";
+BLU="\e[0;34m";
+PRP="\e[0;35m";
+LBL="\e[0;36m";
+
+if [ $(uname) = Darwin ]; then
+    _DPR=gdate
+else 
+    _DPR=date
+fi
+
+function www::edant::src::log() {
+    if [ $MODULE_DEBUG = true ]; then
+        printf "$@\n" >> "$ROOT_DIR/.log"
+    fi
+}
+
+function www::edant::src::is_clean_arg_present() {
+    echo $@ \
+    | grep -oE -- "(-c|--clean)" &>/dev/null
+}
+
+function www::edant::src::parse_clean_args() {
+    echo "$@" \
+    | sed -Ee "s/(.*--clean )|(.*-c )//g"
+}
+
+function www::edant::src::compressor() {
+    local start_ms=$($_DPR +'%s%3N')
+
+    # we're looking for an argument but no more than 1
+    if [ $# -ne 1 ]; then
+        echo "compressor /path/filename"; return 1;
+    else
+        local file=$1
+        # file -> file.gz
+        # (original file preserved)
+        gzip --keep --force --best $file
+    fi
+
+    www::edant::src::log "$($_DPR +"%s%3N-$start_ms" | bc)ms (${FUNCNAME[0]})"
+}
+
+function www::edant::src::init::fs_paths() {
+    local start_ms=$($_DPR +'%s%3N')
+
+    # ~> creates required directories if they don't exist
+    local required_directories=(    \
+        ".tmp/hashes"               \
+        "$SRC_DIR"                  \
+        "$OUT_DIR/include/js"       \
+        "$OUT_DIR/include/css"      \
+        "$OUT_DIR/include/font"     \
+        "$OUT_DIR/include/images"   \
+        "$OUT_DIR/include/manifest" \
+    )
+    for i in ${required_directories[@]}; do
+        if [ ! -d "$i" ]; then
+            printf $PRP"mkdir"$YLO" -> "$GRN"$i"$RGL"\n"
+            mkdir -p $i
+        fi
+    done
+
+    www::edant::src::log "$($_DPR +"%s%3N-$start_ms" | bc)ms (${FUNCNAME[0]})"
+}
+
+function www::edant::src::init::write_filelist() {
+    local start_ms=$($_DPR +'%s%3N')
+
+    # ~> write file lists for comparison in the build functions
+    local last_dir=$PWD
+    cd $SRC_DIR
+
+    local html_files=$(ls --color=never html/*.html)
+    local style_scss_files=$(ls --color=never css/*.scss)
+    local font_scss_files=$(ls --color=never -d font/*.scss)
+    local font_asset_files=$(ls --color=never -d font/**/*)
+    local manifest_files=$(ls --color=never manifest/*)
+    local img_files=$(ls --color=never -d img/**/*.svg)
+    img_files+=" "$(ls --color=never -d img/**/*.png)
+    local gpu_files=$(ls --color=never -d gpu/**/*)
+    local js_files=$(ls --color=never -d js/*.js)
+
+    cd $last_dir
+
+    echo $html_files        > .tmp/html_files
+    echo $style_scss_files  > .tmp/style_scss_files
+    echo $font_scss_files   > .tmp/font_scss_files
+    echo $font_asset_files  > .tmp/font_asset_files
+    echo $manifest_files    > .tmp/manifest_files
+    echo $img_files         > .tmp/img_files
+    echo $gpu_files         > .tmp/gpu_files
+    echo $js_files          > .tmp/js_files
+
+    touch .tmp/all_scss_files
+    echo $style_scss_files >> .tmp/all_scss_files
+    echo $font_scss_files >> .tmp/all_scss_files
+
+    www::edant::src::log "$($_DPR +"%s%3N-$start_ms" | bc)ms (${FUNCNAME[0]})"
+}
+
+function www::edant::src::build::js() {
+    local start_ms=$($_DPR +'%s%3N')
+
+    function _next() {
+        local i=$1
+        local js_f=$(basename $i)
+        local js_f_ext="${js_f#*.}"
+        local js_f_noext="${js_f%%.*}"
+
+        local js_srcf="$SRC_DIR/js/$js_f"
+        local js_srcf_noext="$SRC_DIR/js/$js_f_noext"
+
+        local js_outf="$OUT_DIR/include/js/$js_f"
+        local js_outf_noext="$OUT_DIR/include/js/$js_f_noext"
+
+        shasum -a 1 ${SRC_DIR}/${i} > .tmp/hashes/${js_f}.new
+        md5sum ${SRC_DIR}/${i} > .tmp/hashes/${js_f}.new
+        if ! diff .tmp/hashes/${js_f}.new .tmp/hashes/${js_f}.old &>/dev/null; then
+
+            if [ "$js_f_ext" = "min.js" ]; then
+                #printf $PRP"${js_f}"$YLO" -> "$GRN"${js_outf_noext}.min.js"
+                cp -rf ${js_srcf} ${js_outf}
+
+                #printf ".gz"$RGL"\n"
+                www::edant::src::compressor ${js_outf_noext}.min.js
+
+            elif [ "$js_f_ext" = "js" ]; then
+                #printf $PRP"${js_f}"$YLO" -> "$GRN"${js_f_noext}.min.js"
+                uglifyjs \
+                    --webkit --v8 --compress --mangle \
+                    --output ${js_outf_noext}.min.js \
+                    -- ${js_srcf}
+
+                #printf ".gz"$RGL"\n"
+                www::edant::src::compressor ${js_outf_noext}.min.js
+            fi
+
+            printf $PRP"${js_f}"$YLO" -> "$GRN"${js_outf_noext}.min.js.gz\n"            
+            mv ".tmp/hashes/${js_f}.new" ".tmp/hashes/${js_f}.old"
+        fi
+    }
+    # ~> js
+    for i in $(cat .tmp/js_files); do
+        _next $i #&
+    done
+
+    www::edant::src::log "$($_DPR +"%s%3N-$start_ms" | bc)ms (${FUNCNAME[0]})"
+}
+
+function www::edant::src::build::font() {
+    local start_ms=$($_DPR +'%s%3N')
+
+    function _next() {
+        local i=$1
+        local font_src_file="$SRC_DIR/$i"
+        local font_out_file="$OUT_DIR/include/$i"
+        if ! diff $font_src_file $font_out_file &>/dev/null; then
+            local font_out_dir=$(dirname $font_out_file)
+            if [ ! -d $font_out_dir ]; then mkdir -p $font_out_dir; fi
+            printf $PRP"$(basename $font_src_file)"$YLO" -> "$GRN"$font_out_file"$RGL"\n"
+            cp -rf $font_src_file $font_out_file
+        fi
+    }
+    # ~> font
+    for i in $(cat .tmp/font_asset_files); do
+        _next $i #&
+    done
+
+    www::edant::src::log "$($_DPR +"%s%3N-$start_ms" | bc)ms (${FUNCNAME[0]})"
+}
+
+function www::edant::src::build::scss() {
+    local start_ms=$($_DPR +'%s%3N')
+
+    # ~> scss
+    #local html_content=$(cat .tmp/html_files)
+    local html_content="out/index.html"
+
+    function _next() {
+        local i=$1
+        local scss_f=$(basename $i)
+        local _outf_noext="$OUT_DIR/include/${i%.*}"
+
+        #shasum -a 1 ${SRC_DIR}/${i} > .tmp/hashes/${scss_f}.new
+        md5sum ${SRC_DIR}/${i} > .tmp/hashes/${scss_f}.new
+        if ! diff .tmp/hashes/${scss_f}.new .tmp/hashes/${scss_f}.old &>/dev/null; then
+
+            # sass -> (purged) css
+            #printf $PRP"${i%.*}"$YLO" -> "$GRN"${_outf_noext}.css"
+            sass \
+                $SRC_DIR/$i \
+                ${_outf_noext}.fat.css \
+                || return 1
+            purgecss \
+                --css ${_outf_noext}.fat.css \
+                --content ${html_content} \
+                --output ${_outf_noext}.css \
+                || return 1
+
+            # css -> css (min)
+            #printf "\b\b\bmin.css"
+            uglifycss \
+                ${_outf_noext}.css \
+                --output ${_outf_noext}.min.css \
+                || return 1
+
+            # css -> css (compress)
+            #printf ".gz"
+            www::edant::src::compressor \
+                ${_outf_noext}.min.css \
+                || return 1
+
+            #printf "\n"$RGL
+
+            mv .tmp/hashes/${scss_f}.new .tmp/hashes/${scss_f}.old
+            printf $PRP"${i%.*}"$YLO" -> "$GRN"${_outf_noext}.min.css.gz\n"
+        fi
+    }
+
+    for i in $(cat .tmp/all_scss_files); do
+        _next $i #&
+    done
+
+    www::edant::src::log "$($_DPR +"%s%3N-$start_ms" | bc)ms (${FUNCNAME[0]})"
+}
+
+function www::edant::src::build::html() {
+    local start_ms=$($_DPR +'%s%3N')
+
+    function _next() {
+        local i=$1
+        local html_src_file="$SRC_DIR/$i"
+        local html_out_file="$OUT_DIR/$(basename $i)"
+        # below is the same as basename $i, for reference:
+        #local basename_html_out_file=${html_out_file##*/}
+        
+        if ! diff $html_src_file $html_out_file &>/dev/null; then
+            cp -rf $html_src_file $html_out_file || return 1
+            printf $PRP"$(basename $html_src_file)"$YLO" -> "$GRN"$html_out_file"$RGL"\n"
+        fi
+    }
+
+    # ~> html
+    for i in $(cat .tmp/html_files); do
+        _next $i #&
+    done
+
+    www::edant::src::log "$($_DPR +"%s%3N-$start_ms" | bc)ms (${FUNCNAME[0]})"
+}
+
+function www::edant::src::build::manifest() {
+    local start_ms=$($_DPR +'%s%3N')
+
+    # ~> manifest
+    for i in $(cat .tmp/manifest_files); do
+        local manifest_src_file="$SRC_DIR/$i"
+        local manifest_out_file="$OUT_DIR/$(basename $i)"
+        
+        if ! diff $manifest_src_file $manifest_out_file &>/dev/null; then
+            printf $PRP"$(basename $manifest_src_file)"$YLO" -> "$GRN"$manifest_out_file"$RGL"\n"
+            cp -rf $manifest_src_file $manifest_out_file || return 1
+        fi
+    done
+
+    www::edant::src::log "$($_DPR +"%s%3N-$start_ms" | bc)ms (${FUNCNAME[0]})"
+}
+
+function www::edant::src::build::img() {
+    local start_ms=$($_DPR +'%s%3N')
+    # ~> img
+
+    function _next() {
+        local img_src_file="$SRC_DIR/$i"
+        local img_out_file="$OUT_DIR/include/$i"
+
+        if ! diff $img_src_file $img_out_file &>/dev/null; then
+            
+            local img_out_dir=$(dirname $img_out_file)
+
+            # check if this file's out directory exists
+            if [ ! -d $img_out_dir ]; then 
+                mkdir -p $img_out_dir
+            fi
+
+            # ~> copy to the out directory
+            printf $PRP"$(basename $img_src_file)"$YLO" -> "$GRN"$img_out_file"$RGL"\n"
+            cp -rf $img_src_file $img_out_file || return 1
+        fi
+    }
+    for i in $(cat .tmp/img_files); do
+        _next $i #&
+    done
+    www::edant::src::log "$($_DPR +"%s%3N-$start_ms" | bc)ms (${FUNCNAME[0]})"
+}
+
+function www::edant::src::build::gpu() {
+    local start_ms=$($_DPR +'%s%3N')
+
+    # ~> gpu
+    gpu_src_path="$SRC_DIR/gpu"
+    gpu_out_path="$OUT_DIR/include/gpu"
+    if ! diff $gpu_src_path $gpu_out_path &>/dev/null; then
+        printf $PRP"$(basename $gpu_src_path)"$YLO" -> "$GRN"$gpu_src_path"$RGL"\n"
+        rm -rf $gpu_out_path
+        cp -rf $gpu_src_path $gpu_out_path || return 1
+    fi
+
+    www::edant::src::log "$($_DPR +"%s%3N-$start_ms" | bc)ms (${FUNCNAME[0]})"
+}
+
+function www::edant::src::build() {
+    local start_ms=$($_DPR +'%s%3N')
+
+    if ! which sass &>/dev/null || ! which uglifycss &>/dev/null; then return 1; fi
+    
+    # scss must come after html because of purgecss
+
+    www::edant::src::build::manifest            #|| return 1
+    www::edant::src::build::img                 #|| return 1
+    www::edant::src::build::gpu                 #|| return 1
+    www::edant::src::build::js                  #|| return 1
+
+    www::edant::src::build::font                #|| return 1
+    www::edant::src::build::html                #|| return 1
+    www::edant::src::build::scss \
+    && printf $PRP"$SRC_DIR"$YLO" -> "$GRN"$OUT_DIR"$RGL"\n"
+
+    #printf $GRN"build"$PRP" $SRC_DIR"$YLO" -> "$PRP"$OUT_DIR"$RGL"\n"
+    
+    www::edant::src::log "$($_DPR +"%s%3N-$start_ms" | bc)ms (${FUNCNAME[0]})"
+}
+
+function www::edant::src::clean() {
+    local start_ms=$($_DPR +'%s%3N')
+
+    printf $GRN"clean "$PRP
+    case $1 in
+        hash|hashes)
+            if [ -d .tmp/hashes ]; then
+                rm -rf .tmp/hashes
+                printf $PRP"tmp/hashes "$RGL
+            fi
+        ;;
+        cache|caches)
+            if [ -d .tmp ]; then
+                rm -rf .tmp
+                printf $PRP"tmp "$RGL
+            fi
+        ;;
+        out)
+            if [ -d out ]; then
+                rm -rf out
+                printf $PRP"out "$RGL
+            fi
+        ;;
+        all)
+            if [ -d .tmp ]; then
+                rm -rf .tmp
+                printf $PRP"tmp "$RGL
+            fi
+            if [ -d out ]; then
+                rm -rf out
+                printf $PRP"out "$RGL
+            fi
+        ;;
+    esac
+    printf $RGL"\n"
+
+    www::edant::src::log "$($_DPR +"%s%3N-$start_ms" | bc)ms (${FUNCNAME[0]})"
+}
+
+function www::edant::src::usage() {
+    printf $LBL"module
+    "$YLO"--"$PRP"source "$PRP"
+        "$YLO"--"$PRP"clean 
+            hash
+            cache
+            out
+            all
+        build
+        help
+"$RGL
+}
+
+function www::edant::src::init() {
+    # check if we should run
+    if [ ! -f .manifest ] || [ $(cat .manifest) != $MODULE_NAME ] &>/dev/null; then
+        echo "not in the right directory"
+        return 1
+    fi
+
+    # set up logging
+    if [[ $MODULE_DEBUG = true && "$ROOT_DIR" != "" ]]; then
+        if [ ! -f "$ROOT_DIR/.log" ]; then
+            touch "$ROOT_DIR/.log"
+        fi
+        printf "$MODULE_NAME $(date)\n" >> "$ROOT_DIR/.log"
+    fi
+
+    www::edant::src::init::fs_paths       || return 1
+    www::edant::src::init::write_filelist || return 1
+}
+
+function www::edant::src::main() {
+    local start_ms=$($_DPR +'%s%3N')
+
+    www::edant::src::init || return 1
+
+    if $(www::edant::src::is_clean_arg_present $@); then
+        www::edant::src::clean $(www::edant::src::parse_clean_args $@)
+    fi
+
+    for arg in $@; do case $arg in
+        build)
+            www::edant::src::build || return 1
+        ;;
+        help)
+            www::edant::src::usage
+        ;;
+    esac; done
+
+    www::edant::src::log "$($_DPR +"%s%3N-$start_ms" | bc)ms (${FUNCNAME[0]})"
+}
+
+www::edant::src::main $@

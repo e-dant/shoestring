@@ -1,0 +1,24 @@
+//
+// logo
+//
+$component-logo-line-height:                  70px;
+$component-logo-light-display:                block;
+
+//
+// logo (component, left, top and right)
+//
+.component-logo {
+  display:                                    block;
+  line-height:                                $component-logo-line-height;
+  width:                                      $vertical-menubar-width;
+  position:                                   fixed;
+  top:                                        0;
+  span.component-logo-lg {
+      display:                                block;
+  }
+  span.component-logo-sm {
+      display:                                none;
+  }
+}
+
+

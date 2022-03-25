@@ -1,0 +1,88 @@
+#!/bin/bash
+
+function main() {
+	local project_root=$PWD
+	local project_name=$(cat ${project_root}/.manifest || return 1)
+	local project_config=${project_root}/config
+	local project_build=${project_root}/build
+	local project_src=${project_root}/src
+	local project_cmakelists=${project_root}/config/CMakeLists.txt
+	local project_target=${project_build}/${project_name}
+	local directories=(
+		${project_root}
+		${project_config}
+		${project_build}
+		${project_src}
+	)
+	if [ ! -f "$project_cmakelists" ] || [ ! "$project_name" ]; then
+			echo "cmakelists.txt is invalid or does not exist."
+			return 1
+	elif [ ! -f ".manifest" ] || [ "$(basename $PWD)" != "$project_name" ]; then
+			echo "not in the right directory."
+			return 1
+	else
+		for i in ${directories[@]}; do
+			if [ ! -d $i ]; then
+				echo "directory structure is invalid."
+				echo "see cmakelists.txt -> notes -> directories for documentation."
+				return 1
+			fi
+		done
+	fi
+
+	if echo $@ | grep "clean" &>/dev/null; then
+		# remove byproduct files, such as the cache 
+		# and makefiles that cmake produces
+		local _removeable_files=(
+			"${project_config}/cmake_install.cmake"
+			"${project_config}/Makefile"
+			"${project_config}/CMakeCache.txt"
+			"${project_config}/CMakeFiles"
+		)
+		for i in ${_removeable_files[@]}; do
+			if [[ -f $i || -d $i ]]; then
+				rm -r $i
+			fi
+		done
+	fi
+	if echo $@ | grep "build" &>/dev/null; then
+		local _last_dir=$PWD
+		cd ${project_config}
+		# build => cmake -> make
+		cmake CMakeLists.txt && make
+		cd $_last_dir
+	fi
+	if echo $@ | grep "run" &>/dev/null; then
+		local run_args=$(echo $@ | sed -E "s/^module.*run (.*)/\1/g")
+		if [ "$run_args" != = ]; then
+			echo "arguments: ${run_args}"
+		fi
+		# ok now run
+		${project_target} ${run_args}
+	elif echo $@ | grep -E "stop|kill" &>/dev/null; then
+		_target_process_pid=$(
+			ps | grep -E "${project_name}" \
+			| sed -E "s|^(....[0-9]).*[0-9]+\.[0-9]+\ (${project_target})(.*)$|\1|g" \
+			| head -n 1)
+		_target_process_name=$(
+			ps | grep -E "${project_name}" \
+			| sed -E "s|^(....[0-9]).*[0-9]+\.[0-9]+\ (${project_target})(.*)$|\2|g" \
+			| head -n 1)
+		_target_process_arguments=$(
+			ps | grep -E "${project_name}" \
+			| sed -E "s|^(....[0-9]).*[0-9]+\.[0-9]+\ (${project_target})(.*)$|\3|g" \
+			| head -n 1)
+		if  echo ${_target_process_pid} | grep -- "grep -E ${project_name}" &>/dev/null; then
+			echo "not running"
+			return 0
+		fi
+		echo "process name: ${_target_process_pid}"
+		echo "process arguments: ${_target_process_arguments}"
+		echo "process pid ${_target_process_pid}"
+		kill ${_target_process_pid}
+	fi
+
+}
+
+main "$@"
+

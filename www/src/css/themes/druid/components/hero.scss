@@ -1,0 +1,26 @@
+//
+// hero
+//
+
+$hero-bg: linear-gradient(to bottom,#8669ed,#727cf5);
+.hero-section {
+    position: relative;
+    padding: 80px 0 120px 0;
+
+    &:after {
+        content: ' ';
+        background-image: $hero-bg;
+        position: absolute;
+        top: -400px;
+        right: 0;
+        bottom: 0;
+        z-index: -1;
+        width: 100%;
+        border-radius: 0;
+        transform: skewY(-3deg);
+    }
+
+    .hero-title {
+        line-height: 42px;
+    }
+}

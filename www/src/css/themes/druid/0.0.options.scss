@@ -1,0 +1,33 @@
+//
+// options
+//
+
+// global theme options are found in these imports.
+// feel free to play with them.
+
+//
+// options -> theme settings
+//
+// switch these around (to true or false) 
+// for various global effects
+$enable-caret:                true;
+$enable-rounded:              true;
+$enable-shadows:              false;
+$enable-gradients:            false;
+$enable-transitions:          true;
+$enable-reduced-motion:       true;
+$enable-smooth-scroll:        true;
+$enable-grid-classes:         true;
+$enable-cssgrid:              false;
+$enable-button-pointers:      true;
+$enable-rfs:                  true;
+$enable-validation-icons:     true;
+$enable-negative-margins:     true;
+$enable-deprecation-messages: true;
+$enable-important-utilities:  true;
+
+//
+// options -> global root variable prefix
+//
+// bootstrap => bs-{css variable}
+$variable-prefix:             bs-;

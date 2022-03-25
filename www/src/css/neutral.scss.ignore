@@ -1,0 +1,54 @@
+// => Light Theme
+
+//Core files
+@import "../bootstrap/scss/functions";
+@import "../bootstrap/scss/variables";
+@import "themes/neutral/custom-variables";
+@import "themes/neutral/variables";
+@import "../bootstrap/scss/bootstrap";
+
+@import "templates/generic";
+
+//// Structure
+//@import "structure/general";
+//@import "structure/left-menu";
+//@import "structure/topbar";
+//@import "structure/right-sidebar";
+//@import "structure/page-head";
+//@import "structure/footer";
+//@import "structure/horizontal-nav";
+//
+//// Fonts
+//@import "font/iosevka";
+//@import "font/open-sans";
+//
+//// Icons
+//@import "font/material-design";
+//
+////Components
+//@import "components/mixins";
+//@import "components/breadcrumb";
+//@import "components/buttons";
+//@import "components/badge";
+//@import "components/card";
+//@import "components/custom-forms";
+//@import "components/dropdown";
+//@import "components/forms";
+//@import "components/modal";
+//@import "components/nav";
+//@import "components/popover";
+//@import "components/tables";
+//@import "components/hero";
+//// this login component *must* be last
+//@import "components/login";
+//
+//// Vendor
+//@import "vendor/jquery.toast.min";
+//
+//// Plugins
+//@import "plugins/chartjs";
+//@import "plugins/toaster";
+//@import "plugins/sparklines";
+//@import "plugins/ion-rangeslider";
+//
+//

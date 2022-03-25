@@ -1,0 +1,7 @@
+Edant is an organization created for the love of software. We celebrate automation and revel in the art of computer programming. We write code for clouds and wire transistors all the same. We deliver beautiful software. 
+
+Edant is the best part of Ubuntu and Arch Linux: friendly and focused. We [KISS](http://catb.org/~esr/writings/taoup/html/ch01s07.html) as a matter of [course](http://catb.org/~esr/writings/taoup/html/ch01s08.html). Edant is Bjarne Stroustrup walking into a bar with Linus Torvalds. We contribute to the ISO C++ Study Groups [SG15](https://lists.isocpp.org/sg15/index.php) and [SG20](https://github.com/cplusplus/SG20). We enjoy reading [specifications](https://www.w3.org/TR/SVG2/) and creating [distributed networks](https://docs.docker.com/engine/swarm/). We create servers from scratch in C++ and render webpages with [webassembly](https://emscripten.org). We are fluent and efficient.
+
+Our code is an arrangement of [best practices](https://mvsp.dev/mvsp.en/index.html) and [core guidelines](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines). Our binaries are [analyzed](https://github.com/Ericsson/codechecker), [sanitized](https://clang.llvm.org/docs/AddressSanitizer.html) and [profiled](https://github.com/plasma-umass/coz). Our software is stored in a [private package manager](https://github.com/e-dant/pm). We value our work.
+
+Edant is the harmony of good software and good people. [Get in touch](mailto:edant.io@protonmail.com?subject=edant.io).

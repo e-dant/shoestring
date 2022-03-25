@@ -1,0 +1,57 @@
+//
+// badge
+//
+
+$badge-font-size:                   .75em;
+$badge-font-weight:                 $font-weight-bold;
+$badge-color:                       $white;
+$badge-padding-y:                   .25em;
+$badge-padding-x:                   .4em;
+$badge-border-radius:               $border-radius;
+
+@mixin badge-variant-light($bg) {
+  color: $bg;
+  background-color: rgba($bg, 0.18);
+}
+
+@mixin badge-variant-outline($bg) {
+  color: $bg;
+  border: 1px solid $bg;
+  background-color: transparent;
+}
+
+@each $color, $value in $theme-colors {
+  .badge-#{$color}-lighten {
+    @include badge-variant-light($value);
+    &[href] {
+    color: $value;
+    text-decoration: none;
+    background-color: rgba($value, 0.18);
+    }
+    &[href] {
+    &:hover, &:focus {
+      color: $value;
+      text-decoration: none;
+      background-color: rgba($value, 0.4);
+    }
+  }
+  }
+}
+
+@each $color, $value in $theme-colors {
+  .badge-outline-#{$color} {
+    @include badge-variant-outline($value);
+    &[href] {
+    color: $value;
+    text-decoration: none;
+    background-color: rgba($value, 0.2);
+    }
+    &[href] {
+    &:hover, &:focus {
+      color: $value;
+      text-decoration: none;
+      background-color: rgba($value, 0.2);
+    }
+  }
+  }
+}

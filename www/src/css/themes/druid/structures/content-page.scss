@@ -1,0 +1,23 @@
+//
+// content page
+//
+/*$horizontal-menubar-height*/
+//0 12px 12px 65px;
+//0px 0px 0px 0px;
+.content-page {
+    //margin-left:                              $vertical-menubar-width;
+    margin-left:                              0;
+    overflow:                                 hidden;
+    padding:                                  $content-page-padding;
+    //padding-bottom:                           5rem;
+    //min-height:                               100%;
+}
+
+//@include media-breakpoint-down(md) {
+//  .content-page {
+//    //padding: 65px 10px 65px;
+//    //margin-left:                              $vertical-menubar-width;
+//    margin-left:                              0;
+//    //padding:                                  1rem 1rem 1rem 1rem;
+//  }
+//}

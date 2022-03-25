@@ -1,0 +1,31 @@
+//
+// popover
+//
+
+$popover-font-size:                 $font-size-sm;
+$popover-bg:                        $white;
+$popover-max-width:                 276px;
+$popover-border-width:              $border-width;
+$popover-border-color:              $gray-300;
+$popover-border-radius:             $border-radius-lg;
+$popover-inner-border-radius:       subtract($popover-border-radius, $popover-border-width);
+$popover-box-shadow:                $box-shadow;
+
+$popover-header-bg:                 $gray-100;
+$popover-header-color:              $headings-color;
+$popover-header-padding-y:          .7rem;
+$popover-header-padding-x:          .8rem;
+
+$popover-body-color:                $body-color;
+$popover-body-padding-y:            .5rem;
+$popover-body-padding-x:            .75rem;
+
+$popover-arrow-width:               1rem;
+$popover-arrow-height:              .5rem;
+$popover-arrow-color:               $popover-bg;
+
+$popover-arrow-outer-color:         $gray-400;
+
+.popover-header {
+    margin-top: 0;
+}

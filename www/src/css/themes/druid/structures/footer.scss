@@ -1,0 +1,59 @@
+//
+// footer
+//
+
+.footer
+{
+  font-size:                                  9pt;
+  position:                                   absolute;
+  right:                                      0;
+  left:                                       0;
+  bottom:                                     0;
+  padding:                                    0.2rem 
+                                              2rem 
+                                              0.5rem 
+                                              2rem;
+  background:                                 transparent;
+  transition:                                 all 0.5s;
+  border-top:                                 1px 
+                                              solid 
+                                              tint-color(
+                                                $skyblue, 
+                                                80%);
+                                              //$skyblue;
+                                              //$gray-200;
+  color:                                      $seagreen-triadic-2;
+                                              //tint-color(
+                                              //  $seagreen-complement, 
+                                              //  20%);
+  .footer-links
+  {
+    a
+    {
+      color:                                  tint-color(
+                                                $salmon, 
+                                                20%);
+      //color:                                  $gray-600;
+      margin-left:                            1.5rem;
+      transition:                             all 
+                                              1.5s;
+      //&:hover
+      //{
+      //  color:                                $gray-900;
+      //}
+      //&:first-of-type
+      //{
+      //    margin-left:                        0;
+      //}
+    }
+  }
+}
+
+@include media-breakpoint-down(md)
+{
+  .footer
+  {
+    left:                                     0 !important;
+    text-align:                               center;
+  }
+}

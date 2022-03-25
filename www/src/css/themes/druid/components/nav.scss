@@ -1,0 +1,69 @@
+//
+// nav (navigation: nav and navbar)
+//
+
+.nav-tabs,.nav-pills {
+    > li {
+        > a {
+            color: $gray-700;
+            font-weight: $font-weight-semibold;
+        }
+    }
+}
+
+.nav-pills {
+    > a {
+        color: $gray-700;
+        font-weight: $font-weight-semibold;   
+    }
+}
+
+.bg-nav-pills {
+    background-color: $nav-pills-bg;
+}
+
+.nav-tabs.nav-bordered {
+    border-bottom: 2px solid rgba($gray-600, 0.2);
+
+    .nav-item {
+        margin-bottom: -1px;
+    }
+
+    li {
+        a {
+            border: 0;
+            padding: 0.625rem 1.25rem;
+        }
+        a.active {
+            border-bottom: 2px solid $primary;
+        }
+    }
+}
+
+//.leftbar-nav .nav-link {
+//    color: #cedce4;
+//    display: block;
+//    padding: 10px 30px;
+//    font-size: .9375rem;
+//    position: relative;
+//    transition: all .4s;
+//    list-style:none
+//}
+//
+//.leftbar-nav .nav-link:hover, .leftbar-nav .nav-link:focus, .leftbar-nav .nav-link:active {
+//    color: #fff;
+//    text-decoration:none
+//}
+//
+//.leftbar-nav .nav-link span {
+//    vertical-align:middle
+//}
+//
+//.leftbar-nav .nav-link i {
+//    display: inline-block;
+//    line-height: 1.0625rem;
+//    margin: 0 10px 0 0;
+//    font-size: 1.1rem;
+//    vertical-align: middle;
+//    width:20px
+//}

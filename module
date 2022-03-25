@@ -1,0 +1,520 @@
+#!/bin/bash
+
+MODULE_NAME="$(basename $PWD)"
+MODULE_VERSION="" # defined in main
+RUNNING_CONTAINER_ID="" # defined in main
+
+ROOT_DIR="."
+SRC_DIR="www"
+DOCKERFILE_PATH=$ROOT_DIR
+
+CONTAINER_NAME=$MODULE_NAME
+CLOUD_PROJECT_NAME=$MODULE_NAME
+CLOUD_DEPLOYMENT_NAME=$MODULE_NAME
+CLOUD_DEPLOYMENT_REGION_NAME="us-central1"
+
+MODULE_DEBUG=true
+
+HOST_PORT=8080
+CONTAINER_PORT=8080
+
+TAB="\t";
+RGL="\e[0;0m";
+BLD="\e[0;1m";
+ITA="\e[0;3m";
+UL="\e[0;4m";
+HL="\e[0;7m";
+ST="\e[0;9m";
+GRY="\e[0;30m";
+RED="\e[0;31m";
+GRN="\e[0;32m";
+YLO="\e[0;33m";
+BLU="\e[0;34m";
+PRP="\e[0;35m";
+LBL="\e[0;36m";
+
+if [ $(uname) = Darwin ]; then
+    _DPR=gdate
+else 
+    _DPR=date
+fi
+
+function www::edant::usage() {
+    local start_ms=$($_DPR +'%s%3N')
+    
+    printf $LBL"module"$PRP"
+    "$YLO"--"$PRP"version "$PRP"major"$YLO"."$PRP"minor"$YLO"."$PRP"patch"$PRP"
+    "$YLO"--"$PRP"source "$PRP"
+        "$YLO"--"$PRP"clean 
+            hash
+            cache
+            out
+            all
+        build
+        help
+    browser"$YLO"|"$PRP"open
+    attach"$YLO"|"$PRP"shell
+    deploy"$YLO"|"$PRP"push
+    quick"$YLO"|"$PRP"full
+    build
+    clean
+    kill
+    curl
+    help
+    run
+"$RGL
+
+    www::edant::log "$($_DPR +"%s%3N-$start_ms" | bc)ms (${FUNCNAME[0]})"
+}
+
+function www::edant::log() {
+    if [ $MODULE_DEBUG = true ]; then
+        printf "$@\n" >> "$ROOT_DIR/.log"
+    fi
+}
+
+function www::edant::ilog() {
+    printf $PRP"$CONTAINER_NAME"$LBL"@"$YLO"$MODULE_VERSION"$GRN" $@"$RGL"\n"
+}
+
+function www::edant::is_source_arg_present() {
+    echo $@ \
+    | grep -oE -- "(\ -s\ |\ --source\ )" &>/dev/null
+}
+
+function www::edant::parse_module_args() {
+    echo "$@" \
+    | sed -Ee "s/(--source.*)|( -s.*)//g"
+}
+
+function www::edant::parse_source_args() {
+    echo "$@" \
+    | sed -Ee "s/(.*--source )|(.*-s )//g"
+}
+
+function www::edant::parse_version() {
+    echo "$@" \
+    | grep -oE -- "(-v|--version)(=| )([0-9]+)\.([0-9]+)\.([0-9]+)" \
+    | grep -oE "([0-9]+)\.([0-9]+)\.([0-9]+)"
+}
+
+function www::edant::build() {
+    local start_ms=$($_DPR +'%s%3N')
+
+    www::edant::set_version_increment
+    www::edant::update_running_container_id
+
+    docker build -t ${CONTAINER_NAME}:${MODULE_VERSION} $DOCKERFILE_PATH
+    docker tag ${CONTAINER_NAME}:${MODULE_VERSION} ${CONTAINER_NAME}:latest 1>/dev/null
+    printf $PRP"${CONTAINER_NAME}"$LBL"@"$YLO"$MODULE_VERSION"$GRN" created\n"$RGL
+
+    www::edant::log "$($_DPR +"%s%3N-$start_ms" | bc)ms (${FUNCNAME[0]})"
+}
+
+function www::edant::run() {
+    local start_ms=$($_DPR +'%s%3N')
+
+    www::edant::update_running_container_id
+
+    if [ "${RUNNING_CONTAINER_ID}" != "" ]; then
+        if docker container inspect ${RUNNING_CONTAINER_ID} \
+            | grep "\"Status\": \"running\"" &>/dev/null; then
+            www::edant::ilog "running"
+        elif docker container inspect ${RUNNING_CONTAINER_ID} \
+            | grep -E "(\"Status\": \"paused\"|\"Status\": \"exited\")" &>/dev/null; then
+            
+            docker container start ${RUNNING_CONTAINER_ID} 1>/dev/null
+            www::edant::ilog "started"
+        else
+            docker run -e \
+                CONTAINER_PORT=${CONTAINER_PORT} \
+                --rm -dp ${HOST_PORT}:${CONTAINER_PORT} \
+                ${CONTAINER_NAME} 1>/dev/null
+            www::edant::ilog "running"
+        fi
+    else
+        docker run -e \
+            CONTAINER_PORT=${CONTAINER_PORT} \
+            --rm -dp ${HOST_PORT}:${CONTAINER_PORT} \
+            ${CONTAINER_NAME} 1>/dev/null
+        www::edant::ilog "running"
+    fi
+
+    www::edant::log "$($_DPR +"%s%3N-$start_ms" | bc)ms (${FUNCNAME[0]})"
+}
+
+function www::edant::clean() {
+    local start_ms=$($_DPR +'%s%3N')
+
+    www::edant::update_running_container_id
+
+    if [ "${RUNNING_CONTAINER_ID}" != "" ]; then
+        docker container stop $RUNNING_CONTAINER_ID 2>/dev/null \
+        && docker container rm $RUNNING_CONTAINER_ID 2>/dev/null
+    fi
+
+    local _unnamed=$(docker images|grep "^<none>"|tr -s " "|cut -d' ' -f3|tr '\n' ' ')
+    if [ "$_unnamed" != "" ]; then
+        for i in $_unnamed; do
+            docker container stop $i 2>/dev/null
+        done
+        docker rmi -f $_unnamed 2>/dev/null
+    fi
+
+    if echo "$1" | grep -E "^-" &>/dev/null; then
+        if echo "$1" | grep "a" &>/dev/null; then
+            local _all_global=$(\
+                docker images\
+                |tr -s " "|cut -d' ' -f3|tr '\n' ' '|sed 's/^IMAGE //g')
+            if [ "$_all_global" != "" ]; then
+                for i in $_all_global; do
+                    docker container stop $i 2>/dev/null
+                    docker rmi -f $i 2>/dev/null
+                done
+            fi
+        fi
+        if echo "$1" | grep "f" &>/dev/null; then
+            local _all_local=$(\
+                docker images\
+                |grep "$CONTAINER_NAME"\
+                |tr -s " "|cut -d' ' -f3|tr '\n' ' ')
+            if [ "$_all_local" != "" ]; then
+                for i in $_all_local; do
+                    docker container stop $i 2>/dev/null
+                done
+                docker rmi -f $_all_local 2>/dev/null
+            fi
+        fi
+    fi
+
+    docker system prune -f 2>/dev/null \
+    && printf $LBL"system pruned\n"$RGL
+
+    www::edant::log "$($_DPR +"%s%3N-$start_ms" | bc)ms (${FUNCNAME[0]})"
+}
+
+function www::edant::attach() {
+    #docker RUNNING_CONTAINER_ID ls|head -n 2|tail -n 1|sed "s/\ .*//g"
+    www::edant::update_running_container_id
+    if [ "${RUNNING_CONTAINER_ID}" != "" ]; then
+        docker exec -it $RUNNING_CONTAINER_ID /bin/zsh
+    else
+        echo "container is not running -- start it."
+    fi
+}
+
+function www::edant::update_running_container_id() {
+    # get the running module's name 
+    # and set the corresponding global
+    RUNNING_CONTAINER_ID=$(docker container ls -aqf "ancestor=${CONTAINER_NAME}")
+}
+
+function www::edant::get_version() {
+    local start_ms=$($_DPR +'%s%3N')
+
+    # TODO
+    ## this is ugly, but works quite well.
+    ## fix it.
+    local major_modifier="$1"
+    local minor_modifier="$2"
+    local micro_modifier="$3"
+
+    local major="$(cat .version/major)"
+    local minor="$(cat .version/minor)"
+    local micro="$(cat .version/micro)"
+
+    if [ "$major_modifier" = "+" ]; then
+        major="$(echo $major+1|bc)"
+        echo $major > .version/major
+    elif $(echo -n "$major_modifier" | grep -E "^[0-9]+$" &>/dev/null); then
+        major="$major_modifier"
+        echo $major > .version/major
+    elif [ "$major_modifier" = "" ]; then
+        major=$(cat .version/major)
+    fi
+
+    if [ "$minor_modifier" = "+" ]; then
+        minor="$(echo $minor+1|bc)"
+        echo $minor>.version/minor
+    elif $(echo -n "$minor_modifier" | grep -E "^[0-9]+$" &>/dev/null); then
+        minor="$minor_modifier"
+        echo $minor > .version/minor
+    elif [ "$minor_modifier" = "" ]; then
+        minor=$(cat .version/minor)
+    fi
+
+    if [ "$micro_modifier" = "+" ]; then
+        micro="$(echo $micro+1|bc)"
+        echo $micro>.version/micro
+    elif $(echo -n "$micro_modifier" | grep -E "^[0-9]+$" &>/dev/null); then
+        micro="$micro_modifier"
+        echo $micro > .version/micro
+    elif [ "$micro_modifier" = "" ]; then
+        micro=$(cat .version/micro)
+    fi
+
+    echo "$major.$minor.$micro"
+
+    www::edant::log "$($_DPR +"%s%3N-$start_ms" | bc)ms (${FUNCNAME[0]})"
+}
+
+function www::edant::set_version() {
+    local start_ms=$($_DPR +'%s%3N')
+    # check if we were given a valid version string 
+    # exit if we were not
+    # override the version if we were
+    if ! echo $1 | grep -E "^([0-9]+)\.([0-9]+)\.([0-9]+)" &>/dev/null; then
+        www::edant::usage
+        return 1
+    fi
+    
+    local major=$(echo $1 | sed -E "s/^([0-9]+)\.([0-9]+)\.([0-9]+)/\1/g")
+    local minor=$(echo $1 | sed -E "s/^([0-9]+)\.([0-9]+)\.([0-9]+)/\2/g")
+    local micro=$(echo $1 | sed -E "s/^([0-9]+)\.([0-9]+)\.([0-9]+)/\3/g")
+
+    echo $major > .version/major
+    echo $minor > .version/minor
+    echo $micro > .version/micro
+
+    MODULE_VERSION=$1
+    www::edant::log "$($_DPR +"%s%3N-$start_ms" | bc)ms (${FUNCNAME[0]})"
+}
+
+function www::edant::set_version_default() {
+    local start_ms=$($_DPR +'%s%3N')
+
+    MODULE_VERSION=$(www::edant::get_version "" "" "")
+
+    www::edant::log "$($_DPR +"%s%3N-$start_ms" | bc)ms (${FUNCNAME[0]})"
+}
+
+function www::edant::open() {
+    if which open &>/dev/null; then
+        open -u http://localhost:${CONTAINER_PORT}
+    elif which curl &>/dev/null; then
+        curl http://localhost:${CONTAINER_PORT}
+    else
+        return 1
+    fi
+}
+
+function www::edant::curl() {
+    if which curl &>/dev/null; then
+        curl http://localhost:${CONTAINER_PORT}
+    else
+        return 1
+    fi
+}
+
+function www::edant::call::source_module() {
+    local start_ms=$($_DPR +'%s%3N')
+
+    local last_dir=$PWD
+    #if [[ ! -d $SRC_DIR ]]; then return 1; fi
+    cd $SRC_DIR
+    # see the note [1] for a 
+    # great digest of ${@:2}
+    ./module $@
+    cd $last_dir
+
+    www::edant::log "$($_DPR +"%s%3N-$start_ms" | bc)ms (${FUNCNAME[0]})"
+}
+
+function www::edant::call::this_module() {
+    for marg in $@; do case $marg in
+        build)
+            www::edant::build
+        ;;
+        clean)
+            local clean_opt=$(echo $@ \
+                | grep -oE "clean( -[a|f]+)" \
+                | grep -oE "(-[a|f]+)" || echo)
+            www::edant::clean $clean_opt
+        ;;
+        run)
+            www::edant::run 
+        ;;
+        attach|shell)
+            www::edant::attach
+        ;;
+        push|deploy)
+            #gcloud run deploy
+            gcloud run deploy ${CLOUD_PROJECT_NAME} \
+                --source=${ROOT_DIR} --concurrency=30 --cpu=1 \
+                --memory=256Mi --platform=managed --cpu-throttling \
+                --ingress=all --allow-unauthenticated \
+                --min-instances=0 --max-instances=5 --timeout=15 \
+                --region=${CLOUD_DEPLOYMENT_REGION_NAME} \
+                --port=${HOST_PORT} --async
+            www::edant::ilog "deployed"
+            #printf $PRP"${CONTAINER_NAME}"$LBL"@"$YLO"$MODULE_VERSION"$GRN" deployed\n"$RGL
+        ;;
+        kill)
+            docker container kill \
+                $(docker container ls -aqf "ancestor=${CONTAINER_NAME}") &>/dev/null
+            www::edant::ilog "killed"
+        ;;
+        quick|full)
+            #cd www
+            rm www/.tmp/hashes/druid.scss.*
+            #./module build
+            docker container kill \
+                $(docker container ls -aqf "ancestor=${CONTAINER_NAME}") &>/dev/null
+            #cd ..
+            ./module build run open
+            #www::edant::call::source_module -c hash
+            #www::edant::call::source_module build
+            #www::edant::clean -af
+            #www::edant::build
+            #www::edant::run
+            #www::edant::open
+        ;;
+        browser|open)
+            www::edant::open
+        ;;
+        curl)
+            www::edant::curl
+        ;;
+        help)
+            www::edant::usage
+        ;;
+    esac; done
+}
+
+function www::edant::set_version_increment() {
+    MODULE_VERSION=$(www::edant::get_version "" "" "+")
+}
+
+function www::edant::init::fs_paths() {
+    local start_ms=$($_DPR +'%s%3N')
+
+    # ~> creates required directories and files if they don't exist
+    local required_directories=(    \
+        "${ROOT_DIR}/.version" \
+    )
+
+    local required_version_files=( \
+        "${ROOT_DIR}/.version/minor" \
+        "${ROOT_DIR}/.version/micro" \
+        "${ROOT_DIR}/.version/major" \
+    )
+
+    for i in ${required_directories[@]}; do
+        if [ ! -d "$i" ]; then
+            printf $PRP"mkdir"$YLO" -> "$GRN"$i"$RGL"\n"
+            mkdir -p $i
+        fi
+    done
+
+    for i in ${required_version_files[@]}; do
+        if [ ! -f "$i" ]; then
+            printf $PRP"default"$YLO" -> "$GRN"$i"$RGL"\n"
+            echo "0" > $i
+        fi
+    done
+
+    # TODO
+    ## this one is not in the loop because 
+    ## we don't print content into it.
+    ## I get it, it's ugly.
+    ## I'd like to use an associative array
+    ## later down the road.
+    touch "${ROOT_DIR}/.version/note"
+
+    www::edant::log "$($_DPR +"%s%3N-$start_ms" | bc)ms (${FUNCNAME[0]})"
+}
+
+function www::edant::init() {
+    local start_ms=$($_DPR +'%s%3N')
+
+    # ~> check if we should run
+    # look for the manifest and dockerfile,
+    # exit if they cannot be found
+    if [ ! -f .manifest ] \
+    || [ $(cat .manifest) != $MODULE_NAME ] &>/dev/null \
+    || [ ! -f Dockerfile ]; then
+        echo "not in the right directory"
+        return 1
+    elif [ ! -f Dockerfile ]; then
+        echo "not in the right directory"
+        return 1;
+    elif ! which docker npm uglifyjs uglifycss purgecss sass shasum date &>/dev/null; then
+        echo "the following packages are required:
+        docker (via pacman/apt/brew/etc)
+        npm (via pacman/apt/brew/etc)
+        shasum (via pacman/apt/brew/etc)
+        uglifyjs (via npm)
+        uglifycss (via npm)
+        purgecss (via npm)
+        sass (via npm)
+        gdate (if on Darwin/Apple) 
+        date (if on Linux)"
+        return 1;
+    elif [ $(uname) = Darwin ] && ! which gdate &>/dev/null; then
+        echo "the following packages are required:
+        docker (via pacman/apt/brew/etc)
+        npm (via pacman/apt/brew/etc)
+        shasum (via pacman/apt/brew/etc)
+        uglifyjs (via npm)
+        uglifycss (via npm)
+        purgecss (via npm)
+        sass (via npm)
+        gdate (if on Darwin/Apple) 
+        date (if on Linux)"
+        return 1
+    fi
+
+    # ~> set up a proper directory tree
+    www::edant::init::fs_paths
+
+    # ~> set up versioning
+    # set to the value provided, if it exists
+    if echo $1 | grep -E "^([0-9]+)\.([0-9]+)\.([0-9]+)" &>/dev/null; then
+        www::edant::set_version $1
+    else
+        www::edant::set_version_default
+    fi
+
+    # ~> set up logging
+    # (only if we're in debug mode, of course)
+    if [[ $MODULE_DEBUG = true && "$ROOT_DIR" != "" ]]; then
+        if [ ! -f "$ROOT_DIR/.log" ]; then
+            touch "$ROOT_DIR/.log"
+        fi
+        printf "$MODULE_NAME $(date)\n" >> "$ROOT_DIR/.log"
+    fi
+
+    # ~> running container id
+    # get the container id of the running image, if any
+    www::edant::update_running_container_id
+
+    www::edant::log "$($_DPR +"%s%3N-$start_ms" | bc)ms (${FUNCNAME[0]})"
+}
+
+function www::edant::main() {
+    local start_ms=$($_DPR +'%s%3N')
+
+    # ~> initialize
+    www::edant::init $(www::edant::parse_version $@ || echo "") \
+    || return 1
+
+    #echo "$(www::edant::parse_source_args $@)"
+    #echo "$(www::edant::parse_module_args $@)"
+    
+    # ~> call the src module before this module
+    www::edant::call::source_module $(www::edant::parse_source_args $@)
+
+    # ~> now do this module's work
+    www::edant::call::this_module $(www::edant::parse_module_args $@)
+    
+    www::edant::log "$($_DPR +"%s%3N-$start_ms" | bc)ms (${FUNCNAME[0]})"
+}
+
+www::edant::main $@
+
+################
+#
+# notes
+#
+# [1] https://unix.stackexchange.com/questions/328882/
+# how-to-add-remove-an-element-to-from-the-array-in-bash

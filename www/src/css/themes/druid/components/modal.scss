@@ -1,0 +1,125 @@
+//
+// modal
+//
+
+$modal-inner-padding:               $spacer - 0.5rem;
+
+// modal-footer-margin-between must be lt/eq to (2*$modal-inner-padding)
+$modal-footer-margin-between:       .5rem;
+
+$modal-dialog-margin:               .5rem;
+$modal-dialog-margin-y-sm-up:       1.75rem;
+
+$modal-title-line-height:           $line-height-base;
+
+$modal-content-color:               null;
+$modal-content-bg:                  $white;
+$modal-content-border-color:        transparent;
+$modal-content-border-width:        $border-width;
+$modal-content-border-radius:       0.2rem;
+$modal-content-inner-border-radius: subtract($modal-content-border-radius, $modal-content-border-width);
+$modal-content-box-shadow-xs:       $box-shadow-sm;
+$modal-content-box-shadow-sm-up:    $box-shadow;
+
+$modal-backdrop-bg:                 $gray-900;
+$modal-backdrop-opacity:            .7;
+$modal-header-border-color:         $border-color;
+$modal-footer-border-color:         $modal-header-border-color;
+$modal-header-border-width:         $modal-content-border-width;
+$modal-footer-border-width:         $modal-header-border-width;
+$modal-header-padding-y:            $modal-inner-padding;
+$modal-header-padding-x:            $modal-inner-padding;
+$modal-header-padding:              $modal-header-padding-y $modal-header-padding-x; // Keep this for backwards compatibility
+
+$modal-sm:                          300px;
+$modal-md:                          500px;
+$modal-lg:                          800px;
+$modal-xl:                          1140px;
+
+$modal-fade-transform:              translate(0, -50px);
+$modal-show-transform:              none;
+$modal-transition:                  transform .3s ease-out;
+$modal-scale-transform:             scale(1.02);
+
+.modal-title {
+    margin-top: 0;
+}
+
+.modal-full-width {
+    width: 95%;
+    max-width: none;
+}
+
+.modal-top {
+    margin: 0 auto;
+}
+
+.modal-right {
+    position: absolute;
+    right: 0;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    height: 100%;
+    margin: 0;
+    background-color: $modal-content-bg;
+    align-content: center;
+    transform: translate(25%,0) !important;
+
+    button.btn-close {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1;
+    }
+}
+
+.modal {
+    &.show {
+        .modal-right, .modal-left {
+            transform: translate(0,0) !important;
+        }
+    }
+}
+
+.modal-bottom {
+    display: flex;
+    flex-flow: column nowrap;
+    -ms-flex-pack: end;
+    justify-content: flex-end;
+    height: 100%;
+    margin: 0 auto;
+    align-content: center;
+}
+
+.modal-colored-header {
+    color: $white;
+    border-radius: 0;
+
+    .btn-close {
+        color: $white !important;
+    }
+}
+
+.modal-filled {
+    color: $white;
+
+    .modal-header {
+        background-color: rgba($white,0.07);
+    }
+
+    .modal-header,.modal-footer {
+        border: none;
+    }
+
+    .btn-close {
+        color: $white !important;
+    }
+}
+
+body {
+    &.modal-open, &.show {
+        padding-right: 0px !important;
+        padding-left: 0px !important;
+    }
+}

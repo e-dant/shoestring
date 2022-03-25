@@ -1,0 +1,15 @@
+//
+// spinner
+//
+
+// scss-docs-start spinner-variables
+$spinner-width:           2rem;
+$spinner-height:          $spinner-width;
+$spinner-vertical-align:  -.125em;
+$spinner-border-width:    .25em;
+$spinner-animation-speed: .75s;
+
+$spinner-width-sm:        1rem;
+$spinner-height-sm:       $spinner-width-sm;
+$spinner-border-width-sm: .2em;
+// scss-docs-end spinner-variables

@@ -1,0 +1,314 @@
+//
+// leftbar (left sidebar)
+//
+
+// leftbar-menu-items (colors)
+$leftbar-menu-item:                           $gray-200;//#cedce4;
+$leftbar-menu-item-hover:                     $white;
+$leftbar-menu-item-active:                    $white;
+
+// sidebars/menubars (colors)
+$leftbar-bg:                                  $seagreen-analogous-1;//$seagreen;
+
+// hamburger
+$leftbar-hamburger-color:                     tint-color(
+                                                $skyblue, 
+                                                95%);
+$leftbar-hamburger-hover-color:               $salmon;
+$leftbar-box-shadow:                          0px
+                                              0px
+                                              100px
+                                              150px
+                                              rgba(
+                                                $seagreen-analogous-1,
+                                                0.15);//$black, 
+// leftbar logo
+$leftbar-logo-width:                          3rem;
+$leftbar-logo-height:                         $leftbar-logo-width;
+$leftbar-logo-height-half:                    calc(
+                                                $leftbar-logo-height 
+                                                / -2);
+$leftbar-logo-line-height:                    $leftbar-logo-height;
+$leftbar-hamburger-hover-transition:          color 1s;
+
+//5rem
+//0 
+//2rem 
+//rgba(
+//  $black, 
+//  0.15);
+//filter:drop-shadow(0px 0px 7px #bcbcbc);
+
+// leftbar background gradient alternatives:
+//$leftbar-bg: linear-gradient(90deg, #727cf5 0%, #8f75da 60%);
+//$leftbar-bg: linear-gradient(135deg, #727cf5 0%, #8f75da 60%);
+.leftbar-hamburger {
+  border:                                     none;
+  color:                                      $leftbar-hamburger-color;
+  height:                                     $topbar-height;
+  line-height:                                $topbar-height;
+  width:                                      60px;
+  background-color:                           transparent;
+  font-size:                                  32px;
+  cursor:                                     pointer;
+  float:                                      left;
+  z-index:                                    1500;
+  position:                                   relative;
+  margin-left:                                $grid-gutter-width;
+  transition:                                 $leftbar-hamburger-hover-transition;
+
+  span {
+    height: 2px;
+    width: 100%;
+    //background-color: $leftbar-hamburger-color;//rgba($white, 0.8);
+    display: block;
+    margin-bottom: 5px;
+    transition: transform .5s ease;
+    &:hover {
+      color: $leftbar-hamburger-hover-color;
+    }
+    &:nth-of-type(2) {
+      width: 24px;
+    }
+  }
+
+  &:hover {
+    color: $leftbar-hamburger-hover-color;
+    transition: none;
+  }
+
+  .leftbar-hamburger-hide {
+    display: none;
+  }
+  .leftbar-hamburger-show {
+    display: block;
+  }
+/*
+  //@include media-breakpoint-down(md) {
+  //  margin: 0 !important;
+  //}
+  //.lines {
+  //  //transition: all .5s ease;
+  //  //width: 18px;
+  //  //height: 16px;
+  //  //display: block;
+  //  //position: relative;
+  //  //margin-top: 26px;
+  //  //margin-left: 10px;
+  //  transition: all .5s ease;
+  //  //right: 30px;
+  //  display: block;
+  //  position: relative;
+  //  margin-top: 26px;
+  //  margin-left: 10px;
+  //  //transform: translate(0, 0);
+  //  font-family: 'Material Design Icons';
+  //  font-size: 1.1rem;
+  //  //line-height: 1.5rem;
+  //  text-rendering: auto;
+  //  &:before {
+  //    content: "\F0142";
+  //  }
+  //}
+*/
+}
+
+.leftbar {
+  //display:                      none;
+  //z-index:                      10 !important;
+  display:                      block;
+  width:                        $vertical-menubar-width;
+  background:                   $leftbar-bg;
+  position:                     fixed;
+  top:                          0;
+  bottom:                       0;
+  z-index:                      1000;
+  padding-top:                  $topbar-height;
+  box-shadow:                   $leftbar-box-shadow;
+  list-style-type:              none;
+  //transition-property:          opacity, left;
+  //transition-duration:          3s, 5s;
+  transition:                   opacity 100ms ease-in-out;
+
+  .leftbar-show {
+    .leftbar {
+      //display:                  block !important;
+      opacity:                  0 !important;
+      visibility:               hidden !important;
+    }
+  }
+
+  .leftbar-hide {
+    .leftbar {
+      opacity:                  0 !important;
+      visibility:               hidden !important;
+    }
+  }
+
+  .leftbar-logo {
+    line-height:          $leftbar-logo-line-height;
+    width:                $leftbar-logo-width;
+    height:               $leftbar-logo-height;
+    margin:               auto;
+    display:              flex;
+    vertical-align:       middle;
+    transform:            translate(
+                            0px, 
+                            $topbar-height-half
+                          ) !important;
+  }
+
+  .leftbar-nav {
+    padding-left: 0;
+    margin-top:4.5rem;
+    list-style-type: none;
+
+    .nav-link {
+      color:                $leftbar-menu-item;
+      display:              block;
+      padding:              10px 30px;
+      margin-top:           0.5rem;
+      margin-left:          1rem;
+      //font-size: 0.9375rem;
+      position:             relative;
+      transition:           all 0.8s;
+      list-style:           none;
+
+      &:hover,
+      &:focus,
+      &:active {
+        color: $leftbar-menu-item-hover;
+        text-decoration: none;
+      }
+
+      //span {
+      //  vertical-align: middle;
+      //}
+      i {
+        display: inline-block;
+        //line-height: 1.0625rem;
+        margin-right: 10px;
+        font-size: 1.1rem;
+        vertical-align: middle;
+        width: 20px;
+      }
+    }
+
+    .menu-arrow {
+      transition: transform .15s;
+      position: absolute;
+      right: 30px;
+      display: inline-block;
+      font-family: 'Material Design Icons';
+      text-rendering: auto;
+      line-height: 1.5rem;
+      font-size: 1.1rem;
+      transform: translate(0, 0);
+      &:before {
+        content: "\F0142";
+      }
+    }
+
+    //.badge {
+    //  margin-top: 3px;
+    //}
+
+    .leftbar-nav-item {
+      > a[aria-expanded="true"] {
+        > span.menu-arrow {
+          transform: rotate(90deg);
+        }
+      }
+
+      &.menuitem-active {
+        > a:not(.collapsed) {
+          > span.menu-arrow {
+            transform: rotate(90deg);
+          }
+        }
+      }
+    }
+
+    .leftbar-nav-title {
+      padding: 12px 30px;
+      letter-spacing:             0.05em;
+      pointer-events:             none;
+      cursor:                     default;
+      font-size:                  0.6875rem;
+      text-transform:             uppercase;
+      color:                      $leftbar-menu-item;
+      font-weight:                $font-weight-bold;
+    }
+
+    .leftbar-nav-sublevel {
+      //padding-left: 0;
+      list-style-type:        none;
+      list-style:             none;
+      li {
+        a {
+          //padding: 8px 30px 8px 65px;
+          color:                  $leftbar-menu-item;
+          display:                block;
+          position:               relative;
+          transition:             all 0.4s;
+          font-size:              0.89rem;
+          &:focus,
+          &:hover {
+            color:                $leftbar-menu-item-hover;
+          }
+
+          .menu-arrow {
+            line-height:          1.3rem;
+          }
+        }
+        &.active {
+          >a {
+            color:                $leftbar-menu-item-active;
+          }
+        }
+      }
+    }
+
+    .menuitem-active {
+      > a {
+        color:                    $leftbar-menu-item-active !important;
+      }
+    }
+  }
+
+}
+
+
+
+*[dir="ltr"] {
+  .leftbar-nav {
+    .leftbar-nav-item {
+      .menu-arrow {
+        &:before {
+          content: "\F0141" !important;
+        }
+      }
+    }
+  }
+}
+
+/*
+@include media-breakpoint-down(md) {
+  .leftbar {
+    box-shadow: $box-shadow;
+    display: none;
+    z-index: 10 !important;
+  }
+
+  .leftbar-show {
+    .leftbar {
+      display: block;
+    }
+  }
+
+  .leftbar-hide {
+    .leftbar {
+      display: none;
+    }
+  }
+*/

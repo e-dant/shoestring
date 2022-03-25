@@ -1,0 +1,44 @@
+//
+// body
+//
+
+//$body-bg:                                     #fafbfe;
+$body-bg:                      tint-color(
+                                 $skyblue, 
+                                 88%);
+$body-color:                   $gray-800;
+$body-text-align:              null;
+
+$link-hover-transition:        color 0.85s;
+
+html {
+  position:                    relative;
+  min-height:                  100%;
+  background-color:            tint-color(
+                                 $skyblue, 
+                                 88%);
+}
+
+a:hover {
+  transition:                  none;
+}
+a {
+  transition:                  $link-hover-transition;
+}
+
+body {
+  overflow-x:                  hidden;
+}
+
+@supports(-webkit-overflow-scrolling: touch) {
+  body 
+  {
+    cursor:                    pointer;
+  }
+}
+
+//@include media-breakpoint-down(md) {
+//  body {
+//    overflow-x: hidden;
+//  }
+//}
