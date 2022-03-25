@@ -1,6 +1,6 @@
 # Shoestring
 
-Shoestring is a complete framework for websites big and small. It includes:
+Shoestring is a handy tooling framework for websites big and small. It includes:
 - `softserve`: a handmade server
 - `druid`: a front-end theme built on Bootstrap@5
 - `module`: a simple and high-level build & CI system
